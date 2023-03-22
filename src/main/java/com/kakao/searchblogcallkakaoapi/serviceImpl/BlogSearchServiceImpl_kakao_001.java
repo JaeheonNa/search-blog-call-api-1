@@ -17,9 +17,6 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class BlogSearchServiceImpl_kakao_001 implements BlogSearchService {
-
-    @Value("${kakao.uri}")
-    private String uri;
     @Value("${kakao.token}")
     private String authorization;
 
@@ -38,7 +35,7 @@ public class BlogSearchServiceImpl_kakao_001 implements BlogSearchService {
     @Override
     public Mono<KakaoResponse> getBlogsFromApi(String query, String sort, int page, int size){
         return webClient.get().uri(uriBuilder1 ->
-                        uriBuilder1.path(this.uri)
+                        uriBuilder1.path("/v2/search/blog")
                                 .queryParam("query", query)
                                 .queryParam("sort", sort)
                                 .queryParam("page", page)

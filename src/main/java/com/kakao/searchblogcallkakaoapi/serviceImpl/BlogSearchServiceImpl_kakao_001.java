@@ -1,47 +1,54 @@
 package com.kakao.searchblogcallkakaoapi.serviceImpl;
 
+import com.kakao.searchblogcallkakaoapi.dto.KakaoResponse;
 import com.kakao.searchblogcallkakaoapi.service.BlogSearchService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BlogSearchServiceImpl_kakao_001 implements BlogSearchService {
 
-    private String reqUri = "https://dapi.kakao.com/v2/search/blog";
-    private String authorization = "KakaoAK 7905d8d8bf472226bd6f6c0900b0b4b5";
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Value("${kakao.uri}")
+    private String uri;
+    @Value("${kakao.token}")
+    private String authorization;
+
+    private WebClient webClient;
+
+    @PostConstruct
+    public void initWebClient() {
+        webClient = WebClient.builder()
+                .baseUrl("https://dapi.kakao.com")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build()
+                .mutate()
+                .build();
+    }
 
     @Override
-    public Map getBlogsFromApi(String query, String sort, int page, int size){
-        Map response   = null;
-
-        UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(this.reqUri)
-                .queryParam("query", query)
-                .queryParam("sort", sort)
-                .queryParam("size", size)
-                .queryParam("page", page)
-                .encode(StandardCharsets.UTF_8)
-                .build(false);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", this.authorization);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity entity = new HttpEntity<>(headers);
-
-        response = restTemplate.exchange(uriBuilder.toUri(), HttpMethod.GET, entity, Map.class).getBody();
-        return response;
+    public Mono<KakaoResponse> getBlogsFromApi(String query, String sort, int page, int size){
+        return webClient.get().uri(uriBuilder1 ->
+                        uriBuilder1.path(this.uri)
+                                .queryParam("query", query)
+                                .queryParam("sort", sort)
+                                .queryParam("page", page)
+                                .queryParam("size", size)
+                                .build()
+                ).headers(headers -> {
+                    headers.add("Authorization", this.authorization);
+                }).accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(KakaoResponse.class);
     }
 
 }

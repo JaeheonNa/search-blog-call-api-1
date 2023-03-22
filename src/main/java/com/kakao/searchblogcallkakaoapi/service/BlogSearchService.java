@@ -1,10 +1,10 @@
 package com.kakao.searchblogcallkakaoapi.service;
 
+import com.kakao.searchblogcallkakaoapi.dto.KakaoResponse;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
+import reactor.core.publisher.Mono;
 
 @Service
 public interface BlogSearchService {
-    Map getBlogsFromApi(String query, String sort, int page, int size);
+    Mono<KakaoResponse> getBlogsFromApi(String query, String sort, int page, int size);
 }

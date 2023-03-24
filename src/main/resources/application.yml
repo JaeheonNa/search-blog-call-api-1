@@ -10,5 +10,6 @@ server:
     threads:
       min-spare: 30
 kakao:
+  baseUri: https://dapi.kakao.com
   uri: /v2/search/blog
   token: KakaoAK 7905d8d8bf472226bd6f6c0900b0b4b5

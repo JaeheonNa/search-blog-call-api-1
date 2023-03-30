@@ -27,6 +27,7 @@ public class BlogSearchServiceImpl_kakao_001 implements BlogSearchService {
 
     @Override
     public Mono<KakaoResponse> getBlogsFromApi(String query, String sort, int page, int size){
+        log.info("Kakao 요청 들어옴.");
         return webClient.get().uri(uriBuilder ->
                         uriBuilder.path("/v2/search/blog")
                                 .queryParam("query", query)
